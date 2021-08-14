@@ -37,6 +37,7 @@ def update() -> None:
     response = requests.get(URL)
     response.raise_for_status()
     bots: Set[str] = set()
+    count = 0
 
     print("Reading file...")
     with zipfile.ZipFile(io.BytesIO(response.content)) as zip:
@@ -51,12 +52,17 @@ def update() -> None:
             cell = cell.strip()
             if cell and 'Compiled by Hackbolt' not in cell:
                 bots.add(cell)
+                count += 1
 
     sorted_bots = sorted(bots)
 
     print("Writing new file...")
     with open("bots_n_bigots.csv", "w") as outfp:
         csv.writer(outfp).writerows([bot] for bot in sorted_bots)
+
+    print(f"Entries: {count:7d}")
+    print(f"Unique:  {len(sorted_bots):7d}")
+    print(f"Doubled: {count - len(sorted_bots):7d}")
 
 if __name__ == '__main__':
     update()
